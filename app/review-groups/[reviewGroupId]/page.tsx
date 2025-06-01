@@ -4,14 +4,12 @@ import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useRequireAuth } from '@/lib/use-require-auth'
 import { 
-  ArrowLeft, 
   Plus, 
   UserPlus, 
   Settings, 
   Star, 
   Users,
   MessageSquare,
-  MoreVertical,
   Loader2
 } from 'lucide-react'
 import AppHeader from '@/components/layout/app-header'
@@ -29,7 +27,7 @@ interface ReviewSubject {
   id: string
   name: string
   images?: string[]
-  metadata?: any
+  metadata?: JSON
   review_count: number
   average_score: number
   latest_review?: {

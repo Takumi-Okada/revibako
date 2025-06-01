@@ -1,13 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase'
 
+
+// 型定義
+interface User {
+  id: string
+  username: string
+  display_id: string
+  avatar_url: string | null
+}
+
+interface EvaluationCriteria {
+  name: string
+}
+
+interface EvaluationScore {
+  criteria_id: string
+  score: number
+  evaluation_criteria: EvaluationCriteria
+}
+
+interface Review {
+  id: string
+  comment: string | null
+  total_score: number
+  images: string[] | null
+  created_at: string
+  updated_at: string
+  users: User
+  evaluation_scores: EvaluationScore[]
+}
+
+interface FormattedEvaluationScore {
+  criteria_id: string
+  criteria_name: string
+  score: number
+}
+
 // GET /api/review-groups/[reviewGroupId]/subjects/[subjectId]/reviews
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ reviewGroupId: string; subjectId: string }> }
 ) {
   try {
-    const { reviewGroupId, subjectId } = await params
+    const { subjectId } = await params
     const supabase = createSupabaseServiceClient()
 
     // レビュー一覧を取得（ユーザー情報と評価スコア含む）
@@ -36,7 +72,10 @@ export async function GET(
       `)
       .eq('review_subject_id', subjectId)
       .is('deleted_at', null)
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false }) as {
+        data: Review[] | null;
+        error: any;
+      };
 
     if (reviewsError) {
       console.error('Reviews fetch error:', reviewsError)
@@ -47,7 +86,7 @@ export async function GET(
     }
 
     // データを整形
-    const formattedReviews = (reviews || []).map((review: any) => ({
+    const formattedReviews = (reviews || []).map((review: Review) => ({
       id: review.id,
       comment: review.comment,
       total_score: review.total_score,
@@ -60,7 +99,7 @@ export async function GET(
         display_id: review.users.display_id,
         avatar_url: review.users.avatar_url
       },
-      evaluation_scores: review.evaluation_scores.map((score: any) => ({
+      evaluation_scores: review.evaluation_scores.map((score: EvaluationScore) => ({
         criteria_id: score.criteria_id,
         criteria_name: score.evaluation_criteria.name,
         score: score.score

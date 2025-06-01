@@ -1,7 +1,7 @@
 'use client'
 
 import { useRequireAuth } from '@/lib/use-require-auth'
-import { Users, Star, Edit, Plus, Link, Loader2 } from 'lucide-react'
+import { Users, Plus, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import AppHeader from '@/components/layout/app-header'

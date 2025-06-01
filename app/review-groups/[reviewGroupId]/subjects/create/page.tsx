@@ -103,7 +103,7 @@ export default function CreateReviewSubjectPage() {
     setError('')
 
     try {
-      let uploadedImageUrls: string[] = []
+      const uploadedImageUrls: string[] = []
 
       // 画像をアップロード
       if (images.length > 0) {

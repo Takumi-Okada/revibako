@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     const displayId = await generateUniqueDisplayId()
 
     // ユーザーを作成または更新
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('users')
       .upsert({
         id: userId,

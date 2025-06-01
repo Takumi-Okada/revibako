@@ -1,6 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase'
 
+
+interface EvaluationCriteria {
+  name: string
+}
+
+interface Category {
+  id: string
+  name: string
+  icon: string
+}
+
+interface ReviewGroup {
+  id: string
+  name: string
+  description: string | null
+  is_private: boolean
+  image_url: string | null
+  created_at: string
+  categories: Category
+}
+
+interface ReviewGroupMember {
+  role: string
+  joined_at: string
+  review_groups: ReviewGroup
+}
+
 export async function POST(request: NextRequest) {
   try {
     const supabase = createSupabaseServiceClient()
@@ -100,8 +127,8 @@ export async function POST(request: NextRequest) {
 
     // 評価基準を作成
     const criteriaToInsert = evaluationCriteria
-      .filter((criteria: any) => criteria.name?.trim())
-      .map((criteria: any, index: number) => ({
+      .filter((criteria: EvaluationCriteria) => criteria.name?.trim())
+      .map((criteria: EvaluationCriteria, index: number) => ({
         review_group_id: group.id,
         name: criteria.name.trim(),
         order_index: index
@@ -178,7 +205,10 @@ export async function GET(request: NextRequest) {
       `)
       .eq('user_id', userId)
       .is('deleted_at', null)
-      .order('joined_at', { ascending: false })
+      .order('joined_at', { ascending: false }) as {
+        data: ReviewGroupMember[] | null;
+        error: any;
+      };
 
     if (error) {
       console.error('Groups fetch error:', error)
@@ -189,7 +219,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({
-      reviewGroups: groups.map((item: any) => ({
+      reviewGroups: groups!.map((item: ReviewGroupMember) => ({
         ...item.review_groups,
         role: item.role,
         joinedAt: item.joined_at,

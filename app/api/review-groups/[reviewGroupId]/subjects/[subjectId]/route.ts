@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase'
 
+interface EvaluationCriteria {
+  name: string
+}
+
+interface EvaluationScore {
+  criteria_id: string
+  score: number
+  evaluation_criteria: EvaluationCriteria
+}
+
 // GET /api/review-groups/[reviewGroupId]/subjects/[subjectId]
 export async function GET(
   request: NextRequest,
@@ -91,7 +101,10 @@ export async function GET(
             name
           )
         `)
-        .in('review_id', reviewIdList)
+        .in('review_id', reviewIdList) as {
+          data: EvaluationScore[] | null;
+          error: any;
+        };
       
       criteriaScores = data
     }
@@ -100,7 +113,7 @@ export async function GET(
     const scoreBreakdown: { [key: string]: { name: string; scores: number[] } } = {}
     
     if (criteriaScores) {
-      criteriaScores.forEach((score: any) => {
+      criteriaScores.forEach((score: EvaluationScore) => {
         const criteriaId = score.criteria_id
         const criteriaName = score.evaluation_criteria.name
         

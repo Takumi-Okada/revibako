@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useRequireAuth } from '@/lib/use-require-auth'
-import { Star, Plus, X, Loader2, Camera } from 'lucide-react'
+import { Star, X, Loader2, Camera } from 'lucide-react'
 import AppHeader from '@/components/layout/app-header'
 
 interface EvaluationCriteria {
@@ -156,7 +156,7 @@ export default function CreateReviewPage() {
     setError('')
 
     try {
-      let uploadedImageUrls: string[] = []
+      const uploadedImageUrls: string[] = []
 
       // 画像をアップロード
       if (images.length > 0) {

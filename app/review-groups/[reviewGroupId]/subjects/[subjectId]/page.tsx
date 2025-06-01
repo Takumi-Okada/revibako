@@ -6,10 +6,7 @@ import { useRequireAuth } from '@/lib/use-require-auth'
 import { 
   Star, 
   MessageSquare, 
-  Users, 
-  Camera,
   Edit,
-  Trash2,
   MoreVertical,
   Loader2,
   Plus,
