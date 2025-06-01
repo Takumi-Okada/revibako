@@ -1,0 +1,124 @@
+Project revibako {
+  database_type: 'PostgreSQL'
+  Note: '''
+    # レビバコ (revibako)
+  '''
+}
+
+// ユーザー
+Table users {
+  id uuid [pk, default: `gen_random_uuid()`, note: 'ユーザーID']
+  display_id varchar(10) [unique, not null, note: '表示用ID（ランダム数字）']
+  email varchar(255) [unique, not null, note: 'メールアドレス']
+  username varchar(50) [not null, note: 'ユーザー名']
+  avatar_url text [note: 'アバター画像URL']
+  created_at timestamp [default: `now()`, note: '作成日時']
+  updated_at timestamp [default: `now()`, note: '更新日時']
+
+  Note: 'ユーザー'
+}
+
+// カテゴリ
+Table categories {
+  id serial [pk, note: 'カテゴリID']
+  name varchar(50) [not null, note: 'カテゴリ名']
+  icon varchar(10) [note: 'アイコン']
+  description text [note: 'カテゴリ説明']
+  order_index integer [default: 0, note: '表示順序']
+  created_at timestamp [default: `now()`, note: '作成日時']
+
+  Note: 'レビューグループのカテゴリマスタ'
+}
+
+// レビューグループ
+Table review_groups {
+  id uuid [pk, default: `gen_random_uuid()`, note: 'グループID']
+  name varchar(100) [not null, note: 'グループ名']
+  description text [note: 'グループ説明']
+  category_id integer [not null, ref: > categories.id, note: 'カテゴリID']
+  is_private boolean [default: true, note: 'プライベートグループか']
+  metadata_fields jsonb [note: 'メタデータのフィールド']
+  image_url text [note: 'グループ画像URL']
+  created_at timestamp [default: `now()`, note: '作成日時']
+  updated_at timestamp [default: `now()`, note: '更新日時']
+  deleted_at timestamp [null, note: '削除日時（論理削除）']
+
+  Note: 'レビューグループ'
+}
+
+// レビューグループメンバー
+Table review_group_members {
+  id uuid [pk, default: `gen_random_uuid()`, note: 'メンバーシップID']
+  review_group_id uuid [not null, ref: > review_groups.id, note: 'グループID']
+  user_id uuid [not null, ref: > users.id, note: 'ユーザーID']
+  role varchar(20) [default: 'member', note: 'ロール']
+  joined_at timestamp [default: `now()`, note: '参加日時']
+  deleted_at timestamp [null, note: '退会日時（論理削除）']
+
+  indexes {
+    (review_group_id, user_id) [unique, note: '1グループ1ユーザー1メンバー']
+  }
+
+  Note: 'レビューグループメンバー'
+}
+
+// 評価基準
+Table evaluation_criteria {
+  id uuid [pk, default: `gen_random_uuid()`, note: '評価基準ID']
+  review_group_id uuid [not null, ref: > review_groups.id, note: 'グループID']
+  name varchar(50) [not null, note: '評価項目名 (おいしさ, 雰囲気, コスパ, etc)']
+  order_index integer [default: 0, note: '表示順序']
+  created_at timestamp [default: `now()`, note: '作成日時']
+  deleted_at timestamp [null, note: '削除日時（論理削除）']
+
+  Note: '評価基準'
+}
+
+// レビュー対象
+Table review_subjects {
+  id uuid [pk, default: `gen_random_uuid()`, note: 'レビュー対象ID']
+  review_group_id uuid [not null, ref: > review_groups.id, note: 'グループID']
+  name varchar(200) [not null, note: 'レビュー対象名']
+  images text[] [note: '画像URL配列']
+  metadata jsonb [note: '住所、ジャンル、その他メタデータ']
+  created_by uuid [not null, ref: > users.id, note: '作成者']
+  created_at timestamp [default: `now()`, note: '作成日時']
+  deleted_at timestamp [null, note: '削除日時（論理削除）']
+
+  Note: 'レビューの対象となるアイテム（映画、レストラン、カフェなど）'
+}
+
+// レビュー
+Table reviews {
+  id uuid [pk, default: `gen_random_uuid()`, note: 'レビューID']
+  review_subject_id uuid [not null, ref: > review_subjects.id, note: 'レビュー対象ID']
+  user_id uuid [not null, ref: > users.id, note: 'レビュー投稿者']
+  comment text [note: 'レビューコメント']
+  total_score decimal(3,2) [note: '総合評価点（平均値）']
+  images text[] [note: '画像URL配列']
+  created_at timestamp [default: `now()`, note: '作成日時']
+  updated_at timestamp [default: `now()`, note: '更新日時']
+  deleted_at timestamp [null, note: '削除日時（論理削除）']
+
+  indexes {
+    (review_subject_id, user_id) [unique, note: '1対象につき1ユーザー1レビュー']
+  }
+
+  Note: 'ユーザーのレビュー情報'
+}
+
+// 評価スコア
+Table evaluation_scores {
+  id uuid [pk, default: `gen_random_uuid()`, note: '評価スコアID']
+  review_id uuid [not null, ref: > reviews.id, note: 'レビューID']
+  criteria_id uuid [not null, ref: > evaluation_criteria.id, note: '評価項目ID']
+  score integer [not null, note: 'スコア']
+  created_at timestamp [default: `now()`, note: '作成日時']
+  updated_at timestamp [default: `now()`, note: '更新日時']
+
+  indexes {
+    (review_id, criteria_id) [unique, note: '1レビューにつき1評価項目1スコア']
+  }
+
+  Note: '各評価項目に対するスコア'
+}

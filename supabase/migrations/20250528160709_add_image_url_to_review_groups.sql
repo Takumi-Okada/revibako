@@ -1,0 +1,1 @@
+ALTER TABLE review_groups ADD COLUMN image_url TEXT;
