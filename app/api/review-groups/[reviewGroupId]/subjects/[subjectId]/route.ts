@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase'
+import { PostgrestError } from '@supabase/supabase-js'
 
 interface EvaluationCriteria {
   name: string
@@ -103,7 +104,7 @@ export async function GET(
         `)
         .in('review_id', reviewIdList) as {
           data: EvaluationScore[] | null;
-          error: any;
+          error: PostgrestError | null;
         };
       
       criteriaScores = data

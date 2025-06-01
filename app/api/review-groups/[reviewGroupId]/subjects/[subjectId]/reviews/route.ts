@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase'
+import { PostgrestError } from '@supabase/supabase-js'
 
 
 // 型定義
@@ -29,12 +30,6 @@ interface Review {
   updated_at: string
   users: User
   evaluation_scores: EvaluationScore[]
-}
-
-interface FormattedEvaluationScore {
-  criteria_id: string
-  criteria_name: string
-  score: number
 }
 
 // GET /api/review-groups/[reviewGroupId]/subjects/[subjectId]/reviews
@@ -74,7 +69,7 @@ export async function GET(
       .is('deleted_at', null)
       .order('created_at', { ascending: false }) as {
         data: Review[] | null;
-        error: any;
+        error: PostgrestError | null;
       };
 
     if (reviewsError) {

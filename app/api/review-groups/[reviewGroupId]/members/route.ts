@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase'
+import { PostgrestError } from '@supabase/supabase-js'
 
 // ユーザー情報のインターフェース
 interface User {
@@ -55,7 +56,7 @@ export async function GET(
       .is('deleted_at', null)
       .order('joined_at', { ascending: true }) as {
         data: ReviewGroupMember[] | null;
-        error: any;
+        error: PostgrestError | null;
       };
 
     if (error) {

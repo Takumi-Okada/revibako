@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase'
+import { PostgrestError } from '@supabase/supabase-js'
 
 
 interface EvaluationCriteria {
@@ -207,7 +208,7 @@ export async function GET(request: NextRequest) {
       .is('deleted_at', null)
       .order('joined_at', { ascending: false }) as {
         data: ReviewGroupMember[] | null;
-        error: any;
+        error: PostgrestError | null;
       };
 
     if (error) {
