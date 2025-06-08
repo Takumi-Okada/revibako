@@ -351,7 +351,7 @@ export default function ReviewSubjectDetailPage() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">あなたのレビュー</h3>
                   <button
-                    onClick={() => router.push(`/review-groups/${groupId}/subjects/${subjectId}/review/edit`)}
+                    onClick={() => router.push(`/review-groups/${groupId}/subjects/${subjectId}/reviews/edit`)}
                     className="text-purple-600 hover:text-purple-700 text-sm font-medium"
                   >
                     編集

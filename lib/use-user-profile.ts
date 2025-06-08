@@ -28,7 +28,7 @@ export function useUserProfile() {
         const data = await response.json()
         
         if (response.ok) {
-          setUserProfile(data.user)
+          setUserProfile(data.profile)
         } else {
           setError(data.error || 'ユーザー情報の取得に失敗しました')
         }

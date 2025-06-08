@@ -122,3 +122,22 @@ Table evaluation_scores {
 
   Note: '各評価項目に対するスコア'
 }
+
+// 招待
+Table invitations {
+  id uuid [pk, default: `gen_random_uuid()`, note: '招待ID']
+  review_group_id uuid [not null, ref: > review_groups.id, note: 'グループID']
+  inviter_id uuid [not null, ref: > users.id, note: '招待者ID']
+  invited_user_display_id varchar(10) [not null, note: '招待されるユーザーの表示ID']
+  status varchar(20) [default: 'pending', note: '招待ステータス (pending, accepted, declined)']
+  responded_at timestamp [null, note: '招待に応答した日時']
+  created_at timestamp [default: `now()`, note: '作成日時']
+  updated_at timestamp [default: `now()`, note: '更新日時']
+
+  indexes {
+    (review_group_id, invited_user_display_id) [unique, note: '1グループにつき1ユーザー1招待（重複防止）']
+    (status) [note: 'ステータスでの検索用']
+  }
+
+  Note: 'レビューグループへの招待'
+}

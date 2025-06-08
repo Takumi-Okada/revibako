@@ -57,7 +57,10 @@ export default function AppHeader({
           {/* 右側 - ユーザーメニュー */}
           {showUserMenu && userProfile && !loading && (
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
+              <button
+                onClick={() => router.push('/profile')}
+                className="flex items-center space-x-2 hover:bg-gray-100 px-3 py-2 rounded-md transition-colors"
+              >
                 <img
                   src={userProfile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.username)}&background=8B5CF6&color=fff&size=32&font-size=0.6`}
                   alt="プロフィール"
@@ -66,7 +69,7 @@ export default function AppHeader({
                 <span className="text-sm font-medium text-gray-700 hidden sm:block">
                   {userProfile.username}
                 </span>
-              </div>
+              </button>
               <button
                 onClick={signOut}
                 className="flex items-center space-x-2 text-sm text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
