@@ -49,7 +49,7 @@ export async function POST(
     }
 
     // 既にグループメンバーかチェック
-    const { data: existingMember, error: existingMemberError } = await supabase
+    const { data: existingMember } = await supabase
       .from('review_group_members')
       .select('id')
       .eq('review_group_id', reviewGroupId)
@@ -65,7 +65,7 @@ export async function POST(
     }
 
     // 既に招待済みかチェック
-    const { data: existingInvitation, error: existingInvitationError } = await supabase
+    const { data: existingInvitation } = await supabase
       .from('invitations')
       .select('id, status')
       .eq('review_group_id', reviewGroupId)

@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServiceClient } from '@/lib/supabase'
+import { PostgrestError } from '@supabase/supabase-js'
+
+interface EvaluationCriteria {
+  name: string
+}
+
+interface EvaluationScore {
+  criteria_id: string
+  score: number
+  evaluation_criteria: EvaluationCriteria
+}
 
 // GET /api/review-groups/[reviewGroupId]/subjects/[subjectId]/reviews/edit
 export async function GET(
@@ -69,7 +80,10 @@ export async function GET(
           name
         )
       `)
-      .eq('review_id', review.id)
+      .eq('review_id', review.id) as {
+        data: EvaluationScore[] | null;
+        error: PostgrestError | null;
+    };
 
     // グループ情報を取得
     const { data: group } = await supabase
@@ -104,9 +118,9 @@ export async function GET(
         images: review.images,
         created_at: review.created_at,
         updated_at: review.updated_at,
-        evaluation_scores: (evaluationScores || []).map((score: any) => ({
+        evaluation_scores: (evaluationScores || []).map((score: EvaluationScore) => ({
           criteria_id: score.criteria_id,
-          criteria_name: score.evaluation_criteria?.name || '',
+          criteria_name: score.evaluation_criteria.name,
           score: score.score
         }))
       },
