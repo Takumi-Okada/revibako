@@ -3,20 +3,20 @@ import { createSupabaseServiceClient } from '@/lib/supabase'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { reviewGroupId: string } }
+  { params }: { params: Promise<{ reviewGroupId: string }> }
 ) {
   try {
+    const { reviewGroupId } = await params
     const { inviterUserId, invitedUserDisplayId } = await request.json()
     
     if (!inviterUserId || !invitedUserDisplayId) {
       return NextResponse.json(
-        { error: '招待者ID、招待するユーザーIDが必要です' },
+        { error: '招待者ID、招待するユーザーのdisplay_idが必要です' },
         { status: 400 }
       )
     }
 
     const supabase = createSupabaseServiceClient()
-    const reviewGroupId = params.reviewGroupId
 
     // 招待者がグループのメンバーかチェック
     const { data: inviterMember, error: memberError } = await supabase
